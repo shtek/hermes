@@ -30,8 +30,10 @@ public class ChromeDriverHelper {
                 "--disable-blink-features",
                 "--disable-blink-features=AutomationControlled",
                 "--no-sandbox",
-                "--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
+           //     "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 11_3_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36",
                 "--window-size=1080,800",
+             //   "--window-size=1080,1200",
+
                 "--ignore-certificate-errors",
                 "--test-type=webdriver");
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
