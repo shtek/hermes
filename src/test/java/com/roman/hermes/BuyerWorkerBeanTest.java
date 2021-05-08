@@ -11,8 +11,8 @@ class BuyerWorkerBeanTest {
     BuyerWorkerBean buyerWorkerBean;
     @Test
     void buy() {
-      //  String url = "https://www.hermes.com/uk/en/product/bolide-1923-30-craft-bag-H073491CKAA/";
-        String url = "https://www.hermes.com";
+       String url = "https://www.hermes.com/uk/en/product/bolide-1923-30-craft-bag-H073491CKAA/";
+       // String url = "https://www.hermes.com";
 
         System.out.println(buyerWorkerBean.buy(url));
     }

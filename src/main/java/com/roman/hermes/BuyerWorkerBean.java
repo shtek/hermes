@@ -21,14 +21,15 @@ public class BuyerWorkerBean {
     String response;
     public String buy(String url) {
       ChromeDriver driver = ChromeDriverHelper.build();
-     //   FirefoxDriver driver = FirefoxDriverHelper.build();
+
 
         List<WebElement> accounts;
      try {
 
          //Creating the JavascriptExecutor interface object by Type casting
         // JavascriptExecutor js = (JavascriptExecutor)driver;
-         driver.get(url);
+        //login from home page
+         driver.get("https://www.hermes.com");
        //  System.out.println("------");
     //    Thread.sleep(5000); // this is enough time to solve puzzle
          //else it throws me to exception
@@ -38,24 +39,51 @@ public class BuyerWorkerBean {
        // wait.until(ExpectedConditions.elementToBeClickable(new By.ByXPath("//*[contains(@class,'button button-icon button-not-black ng-tns-c50-2')]")));
        // wait.until(ExpectedConditions.visibilityOfElementLocated(new By.ByXPath("//*[contains(@class,'button button-icon button-not-black ng-tns-c50-2')]")));
          wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(new By.ByXPath("//*[contains(@class,'button button-icon button-not-black')]")));
-         System.out.println("-------------------------------------------wating 1");
 
          // WebElement account = driver.findElementByXPath("//*[contains(@class,'button button-icon button-not-black ng-tns-c50-2')]");
          accounts = driver.findElementsByXPath("//*[contains(@class,'button button-icon button-not-black')]");
-         System.out.println("--------------xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-----wating 2");
 
-         //System.out.println(accounts.size());
          // WebElement account = driver.findElement(By.className("button button-icon button-not-black ng-tns-c50-2"));
           accounts.get(1).click();
-          //continue login here, somehow more forgiving
-         // and then navigate to a new page from a new tab
+          //now this will open a login page:
+         wait.until(ExpectedConditions.visibilityOfElementLocated(new By.ById("login-email")));
+         WebElement username=  driver.findElement(By.id("login-email"));
+         wait.until(ExpectedConditions.visibilityOfElementLocated(new By.ById("login-password")));
+         WebElement password=driver.findElement(By.id("login-password"));
+         username.sendKeys("shtek@yahoo.com");
+
+         password.sendKeys("pass");
+
+         password.submit();
+         System.out.println("succesfully loged in");
          ((JavascriptExecutor)driver).executeScript("window.open()");
          ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
          driver.switchTo().window(tabs.get(1));
-         driver.get("https://www.hermes.com/uk/en/product/bolide-1923-30-craft-bag-H073491CKAA/");
+         driver.get(url);
+         wait.until(ExpectedConditions.elementToBeClickable (new By.ById("add-to-cart-button-in-stock")));
+         WebElement addToCart = driver.findElement(By.id("add-to-cart-button-in-stock"));
+       //  wait.until(ExpectedConditions.elementToBeClickable (new By.ById("add-to-cart-button-in-stock")));
+       //  WebElement addToCart =driver.findElement(By.id("add-to-cart-button-in-stock"));
+         addToCart.click();
+         //navigate to cart
+         ((JavascriptExecutor)driver).executeScript("window.open()");
+         tabs = new ArrayList<String>(driver.getWindowHandles());
+         driver.switchTo().window(tabs.get(2));
+         driver.get("https://www.hermes.com/uk/en/cart/");
+         //submit the cart content
+         wait.until(ExpectedConditions.elementToBeClickable(new By.ByXPath("//*[contains(@class,'button-dark width-auto button-angular')]")));
 
-         Thread.sleep(5000);
-    //     System.out.println("inside usual");
+         // wait.until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName("button-dark width-auto button-angular")));
+       //  wait.until(ExpectedConditions.visibilityOfElementLocated(new By.ByName("Checkout")));
+         WebElement submitCart = driver.findElementByXPath("//*[contains(@class,'button-dark width-auto button-angular')]");
+        // WebElement submitCart = driver.findElementByName("Checkout");
+
+        // wait.until(ExpectedConditions.elementToBeClickable (new By.ByClassName("button-dark width-auto button-angular")));
+       submitCart.click();
+
+
+         Thread.sleep(12000);
+         System.out.println("ended ok");
      }
        /* catch(org.openqa.selenium.StaleElementReferenceException ex){
          System.out.println("inside stale");
