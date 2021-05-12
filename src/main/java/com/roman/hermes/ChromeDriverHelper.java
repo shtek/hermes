@@ -42,6 +42,7 @@ public class ChromeDriverHelper {
 
         ChromeDriver driver = new ChromeDriver(options);
 
+
         Map<String, Object> params = new HashMap<>();
         params.put("source", "Object.defineProperty(navigator, 'webdriver', { get: () => false })");
         params.put("source", "Object.defineProperty(navigator, 'languages', { get: () => ['en-GB', 'en', 'it'] })");
