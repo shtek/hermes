@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 @Service
 public class BuyerWorkerBean {
@@ -29,14 +31,14 @@ public class BuyerWorkerBean {
          //Creating the JavascriptExecutor interface object by Type casting
         // JavascriptExecutor js = (JavascriptExecutor)driver;
         //login from home page
-//         driver.get("https://www.hermes.com");
-         WebDriverWait wait = new WebDriverWait(driver, 10);
+
+         WebDriverWait wait = new WebDriverWait(driver, 40);
 
          driver.get("https://www.hermes.com/uk/en/privacy-and-cookies-uk/");
          wait.until(ExpectedConditions.elementToBeClickable (new By.ById("onetrust-reject-all-handler")));
          WebElement rejectCookies = driver.findElement(By.id("onetrust-reject-all-handler"));
          rejectCookies.click();
-         driver.get("https://www.hermes.com");
+         driver.get("https://www.hermes.com/uk/en");
 
        // wait.until(ExpectedConditions.elementToBeClickable(new By.ByXPath("//*[contains(@class,'button button-icon button-not-black ng-tns-c50-2')]")));
        // wait.until(ExpectedConditions.visibilityOfElementLocated(new By.ByXPath("//*[contains(@class,'button button-icon button-not-black ng-tns-c50-2')]")));
@@ -54,40 +56,65 @@ public class BuyerWorkerBean {
          WebElement password=driver.findElement(By.id("login-password"));
          username.sendKeys("shtek@yahoo.com");
 
-         password.sendKeys("xxx");
+         password.sendKeys("pass");
 
          password.submit();
-         System.out.println("succesfully loged in");
+         //wait for confirmation of succesful login
+         wait.until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName("notification-message-title")));
+        WebElement welcome =  driver.findElementByClassName("notification-message-title");
+      //   wait.until(ExpectedConditions.textToBePresentInElement(welcome,"Welcome,"));
+         Pattern pattern = Pattern.compile("^Welcome");
+         wait.until( ExpectedConditions.textMatches(new By.ByClassName("notification-message-title"),pattern));
+
          ((JavascriptExecutor)driver).executeScript("window.open()");
          ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
          driver.switchTo().window(tabs.get(1));
-         //here we going to reject cookies
-        // driver.get("https://www.hermes.com/uk/en/privacy-and-cookies-uk/");
-       //  wait.until(ExpectedConditions.elementToBeClickable (new By.ById("onetrust-reject-all-handler")));
-       //  WebElement rejectCookies = driver.findElement(By.id("onetrust-reject-all-handler"));
-        // rejectCookies.click();
-        // tabs = new ArrayList<String>(driver.getWindowHandles());
-        // driver.switchTo().window(tabs.get(1));
          driver.get(url);
+         Thread.sleep(5000);
 
-         wait.until(ExpectedConditions.elementToBeClickable(new By.ByXPath("//*[contains(@id,'add-to-cart-button-in-stock')]")));
+         //it is nit just clickable , it is someting else that needs to happen
+         // if put timer delay it works!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //WebElement addToCart = wait.until(ExpectedConditions.presenceOfElementLocated(new By.ByXPath("//button[@id='add-to-cart-button-in-stock']")));
+         //trigger the reaload of the page
+//         driver.findElementByXPath("//button[@id='add-to-cart-button-in-stock']");
 
-       //  wait.until(ExpectedConditions.visibilityOfElementLocated (new By.ById("add-to-cart-button-in-stock")));
-         //wait.until(ExpectedConditions.elementToBeClickable (new By.ById("add-to-cart-button-in-stock")));
-        // driver.findElementByName(add-to-cart)
-         WebElement addToCart = driver.findElementByXPath("//*[contains(@id,'add-to-cart-button-in-stock')]");
-        //wait.until(ExpectedConditions.elementToBeClickable (new By.ById("add-to-cart-button-in-stock")));
-       //  WebElement addToCart =driver.findElement(By.id("add-to-cart-button-in-stock"));
+
+         // wait the element "Add Item" to become stale
+//        wait.until(ExpectedConditions.stalenessOf(driver.findElementByXPath("//button[@id='add-to-cart-button-in-stock']")));
+
+     //     wait.until(ExpectedConditions.elementToBeClickable(new By.ByXPath("//button[@id='add-to-cart-button-in-stock']")));
+     //    WebElement addToCart = driver.findElementByXPath("//button[@id='add-to-cart-button-in-stock']");
+     //    wait.until(ExpectedConditions.stalenessOf(driver.findElementByXPath("//button[@id='add-to-cart-button-in-stock']")));
+         wait.until(ExpectedConditions.elementToBeClickable(new By.ByXPath("//button[@id='add-to-cart-button-in-stock']")));
+         WebElement  addToCart = driver.findElementByXPath("//button[@id='add-to-cart-button-in-stock']");
+
          addToCart.click();
+
+         //wait.until(ExpectedConditions.elementToBeClickable(driver.findElementByXPath("//button[@class='button-dark width-80']")));
+
+      //   Thread.sleep(5000);
          //navigate to cart
+         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!! too fast item is not in the cart
          //sometimes when it it is too fast the item is not in the cart yet
-         //sometimes it throws accept cookis screen , and it messes up things
-         //navigating to new screen does not help, if i can not put item in the cart quickly
+
+//perhaps better than navigating to another page, is just clicking on view card button
+      // wait.until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName("items-counter ng-tns-c50-2 ng-star-inserted")));
+       wait.until(ExpectedConditions.visibilityOfElementLocated(new By.ById("add-to-cart-title")));
+       wait.until(ExpectedConditions.textToBe(new By.ById("add-to-cart-title"),"This item has been added to the cart"));
+
+
+         //
+ //        WebElement viewCart = driver.findElementByXPath("//button[@class='button-dark width-80']");
+ //        viewCart.click();
 
         ((JavascriptExecutor)driver).executeScript("window.open()");
          tabs = new ArrayList<String>(driver.getWindowHandles());
          driver.switchTo().window(tabs.get(2));
          driver.get("https://www.hermes.com/uk/en/cart/");
+
+
+
+
          //submit the cart content
 //         wait.until(ExpectedConditions.visibilityOfElementLocated(new By.ByXPath("//*[contains(@class,'button-dark width-auto button-angular')]")));
          wait.until(ExpectedConditions.elementToBeClickable(new By.ByXPath("//*[contains(@class,'button-dark width-auto button-angular')]")));
@@ -102,11 +129,16 @@ public class BuyerWorkerBean {
 //it redirects to https://www.hermes.com/uk/en/checkout/?v=2
          //in reality just making some hidden field visible
          ///perform checkout
+         //wait here , or it shows something wrong with address
+         //perhaps instead of waiting i need to check if shpping address is OK . the radion button selected
+//         Thread.sleep(5000);
+         wait.until(ExpectedConditions.visibilityOfElementLocated(new By.ById("shipping-addresses-label")));
+
          wait.until(ExpectedConditions.elementToBeClickable(new By.ById("checkoutPaiementButton")));
 
          WebElement continueSubmit = driver.findElementById("checkoutPaiementButton");
          continueSubmit.click();
-
+        // Thread.sleep(5000); //too muc try to slow lesd
          //select payment method
          //credit card
          //assumed that the address and billing address is already pre populated
@@ -125,18 +157,12 @@ public class BuyerWorkerBean {
          JavascriptExecutor js = (JavascriptExecutor)driver;
          js.executeScript("arguments[0].click();", creditCardRadioButton);
 
-         exe = (JavascriptExecutor) driver;
-         int noOfFrames2 = Integer.parseInt(exe.executeScript("return window.length").toString());
-         System.out.println("No. of iframes on the page are 2 " + noOfFrames2);
 
          //now populate name of card holder
           wait.until(ExpectedConditions.visibilityOfElementLocated (new By.ByXPath("//*[contains(@class,'adyen-checkout__input adyen-checkout__input--text adyen-checkout__input--large')]")));
-         //*[contains(@class,'adyen-checkout__input adyen-checkout__input--text adyen-checkout__input--large')]
           WebElement cardHolderName = driver.findElementByXPath("//*[contains(@class,'adyen-checkout__input adyen-checkout__input--text adyen-checkout__input--large')]");
-          cardHolderName.sendKeys("12345566");
+          cardHolderName.sendKeys("M PARVU");
 
-         int noOfFrames3 = Integer.parseInt(exe.executeScript("return window.length").toString());
-         System.out.println("No. of iframes on the page are 3 " + noOfFrames3);
 
 
          //now populate card number
@@ -146,27 +172,21 @@ public class BuyerWorkerBean {
          wait.until(ExpectedConditions.visibilityOfElementLocated ( new By.ByXPath("//*[contains(@id,'encryptedCardNumber')]")));
 
          WebElement cardNumber = driver.findElementByXPath("//*[contains(@id,'encryptedCardNumber')]");
-         cardNumber.sendKeys("1111222233334444");
+         cardNumber.sendKeys("174207646141043");
 //populate expiry date
 
-         int noOfFrames4 = Integer.parseInt(exe.executeScript("return window.length").toString());
-         System.out.println("No. of iframes on the page are 4 " + noOfFrames4);
 
 
          driver.switchTo().defaultContent();
 
-         int noOfFrames5 = Integer.parseInt(exe.executeScript("return window.length").toString());
-         System.out.println("No. of iframes on the page are 5 " + noOfFrames5);
 
          driver.switchTo().frame(1);
-         int noOfFrames6 = Integer.parseInt(exe.executeScript("return window.length").toString());
-         System.out.println("No. of iframes on the page are 6 " + noOfFrames6);
 
 
          wait.until(ExpectedConditions.visibilityOfElementLocated ( new By.ByXPath("//*[contains(@id,'encryptedExpiryDate')]")));
 
         WebElement cardExpiryDate = driver.findElementByXPath("//*[contains(@id,'encryptedExpiryDate')]");
-        cardExpiryDate.sendKeys("0224");
+        cardExpiryDate.sendKeys("0124");
 
         //switch to another frame
          //in order to populate security code
@@ -175,13 +195,13 @@ public class BuyerWorkerBean {
          wait.until(ExpectedConditions.visibilityOfElementLocated ( new By.ByXPath("//*[contains(@id,'encryptedSecurityCode')]")));
 
          WebElement securityCode = driver.findElementByXPath("//*[contains(@id,'encryptedSecurityCode')]");
-         securityCode.sendKeys("333");
+         securityCode.sendKeys("2436");
 
          driver.switchTo().defaultContent();
-         wait.until(ExpectedConditions.visibilityOfElementLocated ( new By.ByXPath("//*[contains(@class,'ng-dirty ng-valid ng-touched')]")));
-         WebElement acceptTerms = driver.findElementByXPath("//*[contains(@class,'ng-dirty ng-valid ng-touched')]");
-         acceptTerms.click();
-
+         wait.until(ExpectedConditions.visibilityOfElementLocated ( new By.ByXPath("//input[@class='ng-untouched ng-pristine ng-invalid']")));
+         WebElement acceptTerms = driver.findElementByXPath("//input[@class='ng-untouched ng-pristine ng-invalid']");
+         //have to click through with js script as it is not visible
+         js.executeScript("arguments[0].click();", acceptTerms);
 
 
 
@@ -193,6 +213,7 @@ public class BuyerWorkerBean {
 
      catch (Throwable t){
         System.out.println("I am at arroor");
+       // System.out.println(driver.getPageSource());
          t.printStackTrace();
         LOGGER.error(t.getMessage());
 
